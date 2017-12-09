@@ -4,15 +4,16 @@ from django.db import migrations, models
 from django.utils import timezone
 
 
-def forwards_func(apps, schema_editor):
-    # We get the model from the versioned app registry;
+def create_initial_rate(apps, schema_editor):
+    # Inserts a default rate of 2.5% in the db with the current time as a timestamp.
+    # We get the Interest Rate model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
     InterestRate = apps.get_model("calculator", "InterestRate")
     db_alias = schema_editor.connection.alias
     InterestRate.objects.using(db_alias).create(rate=Decimal("0.025"))
 
 
-def reverse_func(apps, schema_editor):
+def undo_initial_rate(apps, schema_editor):
     # remove the initial interest rate of 2.5%
     InterestRate = apps.get_model("calculator", "InterestRate")
     db_alias = schema_editor.connection.alias
@@ -35,5 +36,5 @@ class Migration(migrations.Migration):
                 ('since', models.DateTimeField(default=timezone.now)),
             ],
         ),
-        migrations.RunPython(forwards_func, reverse_func),
+        migrations.RunPython(create_initial_rate, undo_initial_rate),
     ]
