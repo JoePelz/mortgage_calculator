@@ -124,6 +124,8 @@ class InterestRateModelTests(TestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data.get('result'), 'success')
+        self.assertEqual(data.get('response', {}).get('new_rate'), '0.0500000')
+        self.assertEqual(data.get('response', {}).get('old_rate'), '0.025')
 
         now = timezone.now()
         self.assertEqual(InterestRate.get_rate_at_time(now), Decimal("0.05"))

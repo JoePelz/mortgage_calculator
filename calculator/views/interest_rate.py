@@ -12,7 +12,7 @@ def request(request):
         return HttpResponseNotAllowed(permitted_methods=['PATCH'])
 
     now = timezone.now()
-    rate_per_year = float(InterestRate.get_rate_at_time(now))
+    rate_per_year = InterestRate.get_rate_at_time(now)
     interest_rate = InterestRateView(rate_per_year)
     return interest_rate.patch(request)
 
@@ -43,7 +43,7 @@ class InterestRateView:
             'request': self.operation,
             'request_params': self.params,
             'response': {
-                'old_rate': self.rate_per_year,
+                'old_rate': str(self.rate_per_year),
                 'new_rate': response
             }
         }
