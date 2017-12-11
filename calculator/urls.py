@@ -2,7 +2,7 @@ from django.urls import path
 
 from calculator import views
 
-app_name = 'property'
+app_name = 'calculator'
 
 urlpatterns = [
     path('payment-amount', views.payment_amount, name='payment amount'),
