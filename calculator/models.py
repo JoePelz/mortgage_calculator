@@ -12,25 +12,9 @@ class InterestRate(models.Model):
     @staticmethod
     def get_rate_at_time(time):
         interest_rate = InterestRate.objects.filter(
-            since__lte=time).order_by('-since')[0]
+            since__lte=time).order_by('-since', '-id')[0]
         rate = interest_rate.rate
         return rate
 
     def __str__(self):
         return "{0:0.2f}%".format(self.rate * 100)
-
-
-class Payment:
-    def init(self):
-        self.interest_rate = InterestRate.get_rate_at_time(timezone.now())
-
-    def get(self, asking_price, down_payment, payment_schedule, amortization_period):
-        return 7
-
-class Mortgage:
-    def init(self):
-        self.interest_rate = InterestRate.get_rate_at_time(timezone.now())
-
-    def get(self, payment_amount, down_payment, payment_schedule, amortization_period):
-        return 700
-

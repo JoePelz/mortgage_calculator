@@ -1,11 +1,11 @@
 from django.urls import path
 
-from calculator import views
+from calculator.views import payment_amount, mortgage_amount, interest_rate
 
 app_name = 'calculator'
 
 urlpatterns = [
-    path('payment-amount', views.payment_amount, name='payment amount'),
-    path('mortgage-amount', views.mortgage_amount, name='mortgage amount'),
-    path('interest-rate', views.interest_rate, name='interest rate'),
+    path('payment-amount', payment_amount.request, name='payment amount'),
+    path('mortgage-amount', mortgage_amount.request, name='mortgage amount'),
+    path('interest-rate', interest_rate.request, name='interest rate'),
 ]

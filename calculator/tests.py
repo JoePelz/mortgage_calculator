@@ -34,12 +34,12 @@ class InterestRateModelTests(TestCase):
         self.assertEqual(InterestRate.get_rate_at_time(now + timedelta(hours=1)), Decimal("0.04"))
         self.assertEqual(InterestRate.get_rate_at_time(now + timedelta(hours=-1, seconds=-1)), Decimal("0.01"))
 
-    def test_mortgage_amount_methods(self):
-        response = self.client.get(reverse('calculator:mortgage amount'))
+    def test_payment_amount_methods(self):
+        response = self.client.get(reverse('calculator:payment amount'))
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('calculator:mortgage amount'))
+        response = self.client.post(reverse('calculator:payment amount'))
         self.assertEqual(response.status_code, 405)
-        response = self.client.patch(reverse('calculator:mortgage amount'))
+        response = self.client.patch(reverse('calculator:payment amount'))
         self.assertEqual(response.status_code, 405)
 
     def test_payment_amount(self):
@@ -68,6 +68,14 @@ class InterestRateModelTests(TestCase):
         querystring = '?askingprice=500000&downpayment=10000&paymentschedule=biweekly&amortizationperiod=15'
         response = self.client.get(reverse('calculator:payment amount') + querystring)
         self.assertEqual(response.status_code, 400)
+
+    def test_mortgage_amount_methods(self):
+        response = self.client.get(reverse('calculator:mortgage amount'))
+        self.assertEqual(response.status_code, 400)
+        response = self.client.post(reverse('calculator:mortgage amount'))
+        self.assertEqual(response.status_code, 405)
+        response = self.client.patch(reverse('calculator:mortgage amount'))
+        self.assertEqual(response.status_code, 405)
 
     def test_mortgage_amount(self):
         now = timezone.now()
@@ -99,14 +107,6 @@ class InterestRateModelTests(TestCase):
         self.assertEqual(data.get('result'), 'success')
         self.assertAlmostEqual(data.get('response'), 299944.87, places=2)
 
-    def test_payment_amount_methods(self):
-        response = self.client.get(reverse('calculator:payment amount'))
-        self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('calculator:payment amount'))
-        self.assertEqual(response.status_code, 405)
-        response = self.client.patch(reverse('calculator:payment amount'))
-        self.assertEqual(response.status_code, 405)
-
     def test_interest_rate_methods(self):
         response = self.client.get(reverse('calculator:interest rate'))
         self.assertEqual(response.status_code, 405)
@@ -114,3 +114,16 @@ class InterestRateModelTests(TestCase):
         self.assertEqual(response.status_code, 405)
         response = self.client.patch(reverse('calculator:interest rate'))
         self.assertEqual(response.status_code, 400)
+
+    def test_interest_rate(self):
+        now = timezone.now()
+        self.assertEqual(InterestRate.get_rate_at_time(now), Decimal("0.025"))
+
+        request_data = json.dumps({'interestrate': 0.05})
+        response = self.client.patch(reverse('calculator:interest rate'), data=request_data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data.get('result'), 'success')
+
+        now = timezone.now()
+        self.assertEqual(InterestRate.get_rate_at_time(now), Decimal("0.05"))
